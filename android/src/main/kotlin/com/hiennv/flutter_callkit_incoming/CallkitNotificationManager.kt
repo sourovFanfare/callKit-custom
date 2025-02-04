@@ -168,6 +168,19 @@ class CallkitNotificationManager(private val context: Context) {
                 initNotificationViews(notificationSmallViews!!, data)
             }
 
+            notificationBuilder.setContentTitle(
+                data.getString(
+                    CallkitConstants.EXTRA_CALLKIT_NAME_CALLER,
+                    ""
+                )
+            )
+            notificationBuilder.setContentText(
+                data.getString(
+                    CallkitConstants.EXTRA_CALLKIT_HANDLE,
+                    ""
+                )
+            )
+
             notificationBuilder.setStyle(NotificationCompat.DecoratedCustomViewStyle())
             notificationBuilder.setCustomContentView(notificationSmallViews)
             notificationBuilder.setCustomBigContentView(notificationViews)
