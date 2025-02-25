@@ -58,12 +58,12 @@ class CallkitSoundPlayerService : Service() {
         when (audioManager?.ringerMode) {
             AudioManager.RINGER_MODE_SILENT -> {
             }
+
             else -> {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     vibrator?.vibrate(
                         VibrationEffect.createWaveform(
-                            longArrayOf(0L, 1000L, 1000L),
-                            0
+                            longArrayOf(0L, 1000L, 1000L), 0
                         )
                     )
                 } else {
@@ -76,14 +76,13 @@ class CallkitSoundPlayerService : Service() {
     private fun playSound(intent: Intent?) {
         this.data = intent?.extras
         val sound = this.data?.getString(
-            CallkitConstants.EXTRA_CALLKIT_RINGTONE_PATH,
-            ""
+            CallkitConstants.EXTRA_CALLKIT_RINGTONE_PATH, ""
         )
+
         var uri = sound?.let { getRingtoneUri(it) }
         if (uri == null) {
             uri = RingtoneManager.getActualDefaultRingtoneUri(
-                this@CallkitSoundPlayerService,
-                RingtoneManager.TYPE_RINGTONE
+                this@CallkitSoundPlayerService, RingtoneManager.TYPE_RINGTONE
             )
         }
         try {
@@ -98,14 +97,14 @@ class CallkitSoundPlayerService : Service() {
         }
     }
 
+
     private fun mediaPlayer(uri: Uri) {
         mediaPlayer = MediaPlayer()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            val attribution = AudioAttributes.Builder()
-                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                .setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE)
-                .setLegacyStreamType(AudioManager.STREAM_RING)
-                .build()
+            val attribution =
+                AudioAttributes.Builder().setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                    .setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE)
+                    .setLegacyStreamType(AudioManager.STREAM_RING).build()
             mediaPlayer?.setAudioAttributes(attribution)
         } else {
             mediaPlayer?.setAudioStreamType(AudioManager.STREAM_RING)
@@ -131,37 +130,35 @@ class CallkitSoundPlayerService : Service() {
     private fun getRingtoneUri(fileName: String) = try {
         if (TextUtils.isEmpty(fileName)) {
             RingtoneManager.getActualDefaultRingtoneUri(
-                this@CallkitSoundPlayerService,
-                RingtoneManager.TYPE_RINGTONE
+                this@CallkitSoundPlayerService, RingtoneManager.TYPE_RINGTONE
             )
-        }
-        val resId = resources.getIdentifier(fileName, "raw", packageName)
-        if (resId != 0) {
-            Uri.parse("android.resource://${packageName}/$resId")
+        } else if (fileName.startsWith("phone-default::")) {
+            Uri.parse(fileName.replaceFirst("phone-default::", ""))
         } else {
-            if (fileName.equals("system_ringtone_default", true)) {
-                RingtoneManager.getActualDefaultRingtoneUri(
-                    this@CallkitSoundPlayerService,
-                    RingtoneManager.TYPE_RINGTONE
-                )
+            val resId = resources.getIdentifier(fileName, "raw", packageName)
+            if (resId != 0) {
+                Uri.parse("android.resource://${packageName}/$resId")
             } else {
-                RingtoneManager.getActualDefaultRingtoneUri(
-                    this@CallkitSoundPlayerService,
-                    RingtoneManager.TYPE_RINGTONE
-                )
+                if (fileName.equals("system_ringtone_default", true)) {
+                    RingtoneManager.getActualDefaultRingtoneUri(
+                        this@CallkitSoundPlayerService, RingtoneManager.TYPE_RINGTONE
+                    )
+                } else {
+                    RingtoneManager.getActualDefaultRingtoneUri(
+                        this@CallkitSoundPlayerService, RingtoneManager.TYPE_RINGTONE
+                    )
+                }
             }
         }
     } catch (e: Exception) {
         try {
             if (fileName.equals("system_ringtone_default", true)) {
                 RingtoneManager.getActualDefaultRingtoneUri(
-                    this@CallkitSoundPlayerService,
-                    RingtoneManager.TYPE_RINGTONE
+                    this@CallkitSoundPlayerService, RingtoneManager.TYPE_RINGTONE
                 )
             } else {
                 RingtoneManager.getActualDefaultRingtoneUri(
-                    this@CallkitSoundPlayerService,
-                    RingtoneManager.TYPE_RINGTONE
+                    this@CallkitSoundPlayerService, RingtoneManager.TYPE_RINGTONE
                 )
             }
         } catch (e: Exception) {
